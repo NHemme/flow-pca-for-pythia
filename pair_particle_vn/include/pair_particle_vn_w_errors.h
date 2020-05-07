@@ -32,8 +32,8 @@ namespace PCA
 	int n_pT                    = 6;
 	double max_pT               = 3.0;
 	int order                   = 2;
-	double eta_low              = 0.0;
-	double eta_high             = 2.0;
+	double eta_low              = 2.0;
+	double eta_high             = 10.0;
 
 	int N_events_to_generate    = 1000;
 	int N_particles_per_event   = 100;
@@ -42,6 +42,10 @@ namespace PCA
 
 	bool use_seed = true;
 	int seed_index = -1;
+
+	//string resultsDirectory = "results/"
+	//string resultsFilename = "eigensystem.dat";
+	string output_name = "./results/eigensystem.dat";
 
 	// ------------------------------------
 	// Define structs and vectors.
@@ -393,7 +397,6 @@ namespace PCA
 	void update_Q_n()
 	{
 		const int current_n_events = all_events.size();
-		cout << "Top: " << N_total_events << endl;
 		vector<complex<double> > Q_i_jackknife_estimates_flat( N_total_events * n_pT * n_pT, 0.0 );
 		vector<complex<double> > Q_j_jackknife_estimates_flat( N_total_events * n_pT * n_pT, 0.0 );
 		vector<complex<double> > Q_ij_jackknife_estimates_flat( N_total_events * n_pT * n_pT, 0.0 );
@@ -438,12 +441,13 @@ namespace PCA
 				for (int j = 0; j < n_part_j; j++)
 				{
 					if ( pT_i==pT_j and i==j ) continue;
-				    //double delta_eta = eta_bin_i[i] - eta_bin_j[j];
-					//if ( delta_eta*delta_eta >= eta_low*eta_low
-					//	       and delta_eta*delta_eta <= eta_high*eta_high )
+				    double delta_eta = eta_bin_i[i] - eta_bin_j[j];
+					if ( delta_eta*delta_eta >= eta_low*eta_low)
+					{
 						Q_ij_this_event[pT_i][pT_j] += exp( complex<double> ( 0.0, order * ( phi_bin_i[i] - phi_bin_j[j] ) ) );
 						Npairs[pT_i][pT_j]++;
 						Npairs_this_event[pT_i][pT_j]++;
+					}
 				}
 
 				// Finally, add in contributions from this event
@@ -679,6 +683,12 @@ namespace PCA
 					<< mean << " +/- " << sqrt(variance) << endl;
 		}
 		cout << endl;
+
+		bool store_output = true;
+		//string output_name = "./datasets/pp-V1-rapgap-" + to_string(N_total_events) + "-" + to_string(n_pT) + "-" + to_string(Vn_mode) + ".dat";
+		//string output_name = resultsDirectory + resultsFilename;
+		ofstream output(output_name);
+
 		for (int pT_i = 0; pT_i < n_pT; pT_i++)
 		for (int pT_j = 0; pT_j < n_pT; pT_j++)
 		{
@@ -694,19 +704,31 @@ namespace PCA
 				mean += jackknife_eigenvectors[iEvent][pT_i][pT_j];
 			mean /= static_cast<double>(N_total_events);
 
+			double variance = 0.0;
 			double variance_re = 0.0, variance_im = 0.0;
 			for (int iEvent = 0; iEvent < N_total_events; iEvent++)
 			{
 				complex<double> diff = jackknife_eigenvectors[iEvent][pT_i][pT_j] - mean;
 				variance_re += real(diff) * real(diff);
 				variance_im += imag(diff) * imag(diff);
+				variance    += abs(diff) * abs(diff);
 			}
 			variance_re *= prefactor;
 			variance_im *= prefactor;
+			variance    *= prefactor;
 			cout << "Eigenvector #" << pT_i << ", element #" << pT_j << " = "
 					<< eigenvectors_EnsembleAverage[0][pT_i][pT_j] << "; "
 					<< mean << " +/- " << sqrt(variance_re) << " +/- " << sqrt(variance_im) << " I" << endl;
+			if ( store_output )
+				output << pT_i << "   " << pT_j << "   "
+					<< real(eigenvectors_EnsembleAverage[0][pT_i][pT_j]) << "   "
+					<< imag(eigenvectors_EnsembleAverage[0][pT_i][pT_j]) << "   "
+					<< real(mean) << "   " << sqrt(variance_re) << "   "
+					<< sqrt(variance_im) << "   " << sqrt(variance) << endl;
+
+
 		}
+		if ( store_output ) { output.close(); }
 	
 		return;
 	}
