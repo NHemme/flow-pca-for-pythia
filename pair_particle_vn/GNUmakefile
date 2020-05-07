@@ -30,8 +30,6 @@ endif
 SRC			=	$(SRCDIR)/pair_particle_vn.cc
 
 INC			= 	$(INCDIR)/pair_particle_vn.h \
-				$(INCDIR)/pair_particle_vn_Plumberg.h \
-				$(INCDIR)/pair_particle_vn_Heinz.h \
 				$(INCDIR)/pair_particle_vn_w_errors.h \
 				$(INCDIR)/sampled_distribution.h
 
@@ -78,8 +76,6 @@ install:	$(TARGET)
 
 # --------------- Dependencies -------------------
 $(SRCDIR)/pair_particle_vn.cc: $(INCDIR)/pair_particle_vn.h \
-                               $(INCDIR)/pair_particle_vn_Plumberg.h \
-                               $(INCDIR)/pair_particle_vn_Heinz.h \
                                $(INCDIR)/pair_particle_vn_w_errors.h \
                                $(INCDIR)/sampled_distribution.h
 
