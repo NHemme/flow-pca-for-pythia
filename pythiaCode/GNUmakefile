@@ -1,7 +1,7 @@
 # GNUmakefile for pythiaHBT
 # -------------------------
 
-PYTHIAHOME = /Users/nicolinehemme/Documents/Lund\ Universitet/Bachelor\ Project/C++tests/pythia8243
+PYTHIAHOME = path/to/pythia
 
 # Check distribution (use local version first, then installed version).
 ifneq ("$(wildcard $(PYTHIAHOME)/lib/libpythia8.*)","")
