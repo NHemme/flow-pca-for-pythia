@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
 		// if this event was in chosen multiplicity class, print collected particles
 		if ( lower_multiplicity_limit <= multiplicity_this_event
-				and multiplicity_this_event <= upper_multiplicity_limit )
+				and multiplicity_this_event < upper_multiplicity_limit )
 		{
 			output << setprecision(8);
 			for ( const auto & p : particles_to_output )
