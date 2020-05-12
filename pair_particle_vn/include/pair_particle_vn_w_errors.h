@@ -31,6 +31,7 @@ namespace PCA
 
 	int n_pT                    = 6;
 	double max_pT               = 3.0;
+	double min_pT				= 0.0;
 	int order                   = 2;
 	double eta_low              = 2.0;
 	double eta_high             = 10.0;
@@ -90,7 +91,7 @@ namespace PCA
 	// Load data from a file.
 	void read_in_data(string filename)
 	{
-		double delta_pT = max_pT/(n_pT);
+		double delta_pT = (max_pT-min_pT)/(n_pT);
 
 		pT_vec.clear();
 		eta_vec.clear();
@@ -127,9 +128,11 @@ namespace PCA
 				
 			if ( pT >= max_pT )
 				continue;
+			if ( pT <= min_pT )
+				continue;
 			else
 			{
-				int bin = int(pT/delta_pT);
+				int bin = int((pT-min_pT)/delta_pT);
 				eta_vec[bin].push_back(eta);
 				phi_vec[bin].push_back(phi);
 				pT_vec[bin].push_back(pT);
@@ -184,7 +187,7 @@ namespace PCA
 	// Generate data randomly to mimic (non-factorizable) flow.
 	void generate_random_data()
 	{
-		double delta_pT = max_pT/(n_pT);
+		double delta_pT = (max_pT-min_pT)/(n_pT);
 
 		pT_vec.clear();
 		eta_vec.clear();
@@ -253,9 +256,14 @@ namespace PCA
 					//cout << "Warning: pT = " << pT << " larger than max_pT = " << max_pT << " in event = " << event << endl;
 					continue;
 				}
+				if(pT <= min_pT)
+				{
+					//cout << "Warning: pT = " << pT << " smaller than min_pT = " << min_pT << " in event = " << event << endl;
+					continue;
+				}
 				else
 				{
-					int bin = int(pT/delta_pT);
+					int bin = int((pT-min_pT)/delta_pT);
 					eta_vec[bin].push_back(eta);
 					phi_vec[bin].push_back(phi);
 					pT_vec[bin].push_back(pT);

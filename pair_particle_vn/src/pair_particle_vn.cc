@@ -23,13 +23,14 @@ int main(int argc, char *argv[])
 		PCA::Vn_mode                = 0;
 		PCA::n_pT                   = 6;
 		PCA::max_pT                 = 3.0;
+		PCA::min_pT					= 0.3;
 		PCA::order                  = 2;
 		PCA::eta_low                = 2.0;
 		PCA::eta_high               = 10.0;
 		// --------------------------
 		const int nLoops            = 10;
-		const int n_events_per_loop = 10000;
-		PCA::N_particles_per_event  = 1000;
+		const int n_events_per_loop = 100;
+		PCA::N_particles_per_event  = 100;
 		PCA::N_events_to_generate   = n_events_per_loop;
 		PCA::N_total_events         = nLoops*n_events_per_loop;
 		//PCA::N_total_events = 100000;
