@@ -232,7 +232,7 @@ namespace PCA
 			//double v2 = v2_distribution(generator);
 			double v2 = 0.25;
 			double psi2 = psi2_distribution(generator);
-			double psi2_pTslope = psi2_pTslope_distribution(generator);
+			double psi2_pTslope = 0.0*psi2_pTslope_distribution(generator);
 			
 			for (int iParticle = 0; iParticle < N_particles_per_event; iParticle++)
 			{				
@@ -268,7 +268,7 @@ namespace PCA
 					phi_vec[bin].push_back(phi);
 					pT_vec[bin].push_back(pT);
 					event_vec[bin].push_back(event);
-					//cout << "Check: " << pT << "   " << eta << "   " << phi << "   " << event << "   " << bin << endl;
+					cout << "Check: " << pT << "   " << eta << "   " << phi << "   " << event << " " << bin << endl;
 				}
 			}
 		}
@@ -292,6 +292,7 @@ namespace PCA
 				all_events[event_ID_of_this_particle].eta_vec[bin].push_back( eta_vec[bin][iParticle] );
 				all_events[event_ID_of_this_particle].pphi_vec[bin].push_back( phi_vec[bin][iParticle] );
 				all_events[event_ID_of_this_particle].pT_vec[bin].push_back( pT_vec[bin][iParticle] );
+				all_events[event_ID_of_this_particle].eventID = event_ID_of_this_particle;
 			}
 		}
 		//----------------------------------------------
@@ -484,6 +485,10 @@ namespace PCA
 
 				const double npairs_this_event_this_bin = Npairs_this_event[pT_i][pT_j];
 
+//cout << "About to skip eventID = " << eventID_to_skip << endl;
+//cout << "Have the following:" << endl;
+//cout << this_event_Q_i << "   " << this_event_Q_j << "   " << this_event_Q_ij << "   " << npairs_this_event_this_bin << endl;
+
 				// update jackknife averages (skip only current event)
 				for (int jEvent = 0; jEvent < eventID_to_skip; jEvent++)
 				{
@@ -492,6 +497,7 @@ namespace PCA
 					Q_j_jackknife_estimates_flat[index] += this_event_Q_j;
 					Q_ij_jackknife_estimates_flat[index] += this_event_Q_ij;
 					jackknife_Npairs_flat[index] += npairs_this_event_this_bin;
+//cout << "Updated index = " << index << endl;
 				}
 				for (int jEvent = eventID_to_skip + 1; jEvent < N_total_events; jEvent++)
 				{
@@ -500,7 +506,9 @@ namespace PCA
 					Q_j_jackknife_estimates_flat[index] += this_event_Q_j;
 					Q_ij_jackknife_estimates_flat[index] += this_event_Q_ij;
 					jackknife_Npairs_flat[index] += npairs_this_event_this_bin;
+//cout << "Updated index = " << index << endl;
 				}
+//cout << endl << endl;
 
 			}		// end loop over pT bins
 
@@ -565,7 +573,24 @@ namespace PCA
 						* Q_j_jackknife_estimates[iEvent][pT_i][pT_j];
 
 
-		}	
+		}
+
+//for (int iEvent = 0; iEvent < N_total_events; iEvent++)
+//{
+//	cout << "JK " << iEvent << " = {";
+//	for (int pT_i = 0; pT_i < n_pT; pT_i++)
+//	{
+//		cout << "{";
+//		for (int pT_j = 0; pT_j < n_pT; pT_j++)
+//		{
+//			cout << real(V_n_vec[pT_i][pT_j]) << "+(" << imag(V_n_vec[pT_i][pT_j]) << ") I";
+//			if ( pT_j + 1 == n_pT ) cout << "}";
+//			else cout << ", ";
+//		}
+//		cout << endl;
+//	}
+//	cout << "}" << endl << endl;
+//}
 
 		////////////////////////////////////////////////////
 		// Diagonalize Vn matrix averaged over all events
@@ -683,8 +708,11 @@ namespace PCA
 
 			double variance = 0.0;
 			for (int iEvent = 0; iEvent < N_total_events; iEvent++)
+			{
+//				cout << "Jackknife check: " << iEvent << "   " << pT_i << "  " << jackknife_eigenvalues[iEvent][pT_i] << endl;
 				variance += abs( ( jackknife_eigenvalues[iEvent][pT_i] - mean )
 							* ( jackknife_eigenvalues[iEvent][pT_i] - mean ) );
+			}
 			variance *= prefactor;
 			cout << "Eigenvalue #" << pT_i << " = "
 					<< eigenvalues_EnsembleAverage[0][pT_i] << "; "
