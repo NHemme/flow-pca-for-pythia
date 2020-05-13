@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 		// --------------------------
 		// Define parameters for PCA.
 		// --------------------------
-		PCA::Vn_mode                = 0;
+		PCA::Vn_mode                = 1;
 		PCA::n_pT                   = 6;
 		PCA::max_pT                 = 3.0;
 		PCA::min_pT					= 0.3;
